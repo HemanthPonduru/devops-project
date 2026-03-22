@@ -18,3 +18,12 @@ jobs:
 
       - name: Build Docker image
         run: docker build -t devops-backend ./backend
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.Hemanth@1750 }}" | docker login -u "${{ secrets.hemanthponduru }}" --password-stdin
+
+      - name: Tag Docker image
+        run: docker tag devops-backend ${{ secrets.hemanthponduru }}/devops-backend:latest
+
+      - name: Push Docker image
+        run: docker push ${{ secrets.hemanthponduru }}/devops-backend:latest
