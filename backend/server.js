@@ -1,6 +1,5 @@
 const express = require("express");
 const app = express();
-const pool = require("./db");
 
 app.use(express.json());
 
@@ -8,33 +7,26 @@ app.get("/", (req, res) => {
   res.send("My DevOps App is running 🚀");
 });
 
+// TEMPORARY in-memory storage
+let tasks = [];
+
 // Create task
-app.post("/tasks", async (req, res) => {
-  try {
-    console.log("Incoming:", req.body);
+app.post("/tasks", (req, res) => {
+  const { title } = req.body;
 
-    const { title } = req.body;
+  const newTask = {
+    id: tasks.length + 1,
+    title,
+  };
 
-    const newTask = await pool.query(
-      "INSERT INTO tasks (title) VALUES($1) RETURNING *",
-      [title]
-    );
+  tasks.push(newTask);
 
-    res.json(newTask.rows[0]);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Server error");
-  }
+  res.json(newTask);
 });
 
 // Get tasks
-app.get("/tasks", async (req, res) => {
-  try {
-    const allTasks = await pool.query("SELECT * FROM tasks");
-    res.json(allTasks.rows);
-  } catch (err) {
-    console.error(err.message);
-  }
+app.get("/tasks", (req, res) => {
+  res.json(tasks);
 });
 
 app.listen(3000, () => {
